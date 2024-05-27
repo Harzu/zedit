@@ -1,5 +1,6 @@
 const std = @import("std");
 const terminal = @import("terminal");
+const document = @import("document");
 
 const BOTTOM_SCREEN_PADDING: u16 = 2;
 
@@ -16,13 +17,15 @@ const Size = struct {
 pub const Editor = struct {
     close: bool,
     terminal: terminal.Terminal,
+    document: document.Document,
     cusrsor_position: Position,
     editor_size: Size,
 
-    pub fn init(term: terminal.Terminal) Editor {
+    pub fn init(term: terminal.Terminal, doc: document.Document) Editor {
         const size = term.termina_size();
         return Editor{
             .terminal = term,
+            .document = doc,
             .close = false,
             .cusrsor_position = Position{ .x = 0, .y = 0 },
             .editor_size = Size{
@@ -55,18 +58,15 @@ pub const Editor = struct {
 
     fn render_rows(self: *Editor) !void {
         const editor_height = self.editor_size.height;
-        const editor_width = self.editor_size.width;
+        // const editor_width = self.editor_size.width;
         for (0..editor_height) |row_num| {
             try self.terminal.clear_current_line();
-
-            if (row_num == 0) {
-                try self.terminal.write("~ ZEDIT\n\r");
-            } else if (row_num == editor_height / 2) {
-                const message = "Hello from zedit";
-                const message_padding = try padding((editor_width / 2 + 1) - (message.len / 2));
-                try self.terminal.formated_write("~{s}{s}\n\r", .{ message_padding, message });
+            const row_data = self.document.get_row(row_num);
+            if (row_data != null) {
+                // try self.terminal.write(row_data.?);
+                try self.terminal.formated_write("{s}\r\n", .{row_data.?});
             } else {
-                try self.terminal.write("~\n\r");
+                try self.terminal.write("\r\n");
             }
         }
     }
@@ -84,6 +84,7 @@ pub const Editor = struct {
 
         const editor_size = self.terminal.termina_size();
         const status_padding = try padding(editor_size.ws_col - status_content.len);
+        defer std.heap.page_allocator.free(status_padding);
 
         try self.terminal.background_color(231, 231, 231);
         try self.terminal.foreground_color(0, 0, 0);
@@ -128,8 +129,7 @@ pub const Editor = struct {
 };
 
 fn padding(length: usize) ![]u8 {
-    const allocator = std.heap.page_allocator;
-    var slice = try allocator.alloc(u8, length);
+    var slice = try std.heap.page_allocator.alloc(u8, length);
     for (0..slice.len) |index| {
         slice[index] = 32; // Add space char's byte
     }

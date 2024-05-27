@@ -118,7 +118,12 @@ pub const Terminal = struct {
         // TODO: comment what are flags mean
         raw.iflag.ICRNL = false;
         raw.iflag.IXON = false;
+        raw.iflag.BRKINT = false;
+        raw.iflag.INPCK = false;
+        raw.iflag.ISTRIP = false;
+
         raw.oflag.OPOST = false;
+
         raw.lflag.ECHO = false;
         raw.lflag.ICANON = false;
         raw.lflag.ISIG = false;
@@ -189,8 +194,7 @@ pub const Terminal = struct {
     }
 
     pub fn flush(self: *Terminal) !void {
-        if (self.original_termios != null) {
-            try std.posix.tcsetattr(self.stdout.handle, .FLUSH, self.raw_termios.?);
-        }
+        // TODO: need make raw_termios unoptional
+        try std.posix.tcsetattr(self.stdout.handle, .FLUSH, self.raw_termios.?);
     }
 };

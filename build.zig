@@ -23,9 +23,17 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const document_module = b.addModule("document", .{
+        .root_source_file = .{ .path = "src/document.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
     exe.root_module.addImport("terminal", terminal_module);
     exe.root_module.addImport("editor", editor_module);
+    exe.root_module.addImport("document", document_module);
     editor_module.addImport("terminal", terminal_module);
+    editor_module.addImport("document", document_module);
 
     // Libc
     exe.linkLibC();
