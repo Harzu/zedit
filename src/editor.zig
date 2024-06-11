@@ -131,7 +131,7 @@ pub const Editor = struct {
         try self.terminal.reset_background();
         try self.terminal.reset_foreground();
 
-        try self.terminal.write("CTRL+Q: exist\r");
+        try self.terminal.write("CTRL+Q: exist, CTRL+S: save\r");
     }
 
     fn process_next_key(self: *Editor) !void {
