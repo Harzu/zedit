@@ -66,6 +66,7 @@ pub const KeyEvent = union(enum) {
                 0x1C...0x1F => |char| KeyEvent{ .CtrlChar = char - 0x1C + 0x34 },
                 0x0D => KeyEvent.Enter,
                 0x09 => KeyEvent.Tab,
+                0x7F => KeyEvent.Backspace,
                 else => KeyEvent{ .Char = c0 },
             };
         }
@@ -173,8 +174,16 @@ pub const Terminal = struct {
         try self.write("\x1B[2K");
     }
 
-    pub fn cursor_go_to(self: *Terminal, x: u16, y: u16) !void {
+    pub fn cursor_go_to(self: *Terminal, x: u64, y: u64) !void {
         try self.stdout.writer().print("\x1B[{d};{d}H", .{ y + 1, x + 1 });
+    }
+
+    pub fn cursor_hide(self: *Terminal) !void {
+        try self.write("\x1B[?25l");
+    }
+
+    pub fn cursor_show(self: *Terminal) !void {
+        try self.write("\x1B[?25h");
     }
 
     pub fn background_color(self: *Terminal, r: u16, g: u16, b: u16) !void {

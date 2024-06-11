@@ -13,3 +13,7 @@ run: build
 .PHONY: run_with_file
 run_with_file: build
 	./zig-out/bin/zedit ./src/terminal.zig
+
+.PHONY: run_with_file
+run_with_empty_file: build
+	./zig-out/bin/zedit ./test.txt

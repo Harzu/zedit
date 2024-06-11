@@ -6,25 +6,25 @@ pub fn build(b: *std.Build) void {
 
     const exe = b.addExecutable(.{
         .name = "zedit",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
 
     const terminal_module = b.addModule("terminal", .{
-        .root_source_file = .{ .path = "src/terminal.zig" },
+        .root_source_file = b.path("src/terminal.zig"),
         .target = target,
         .optimize = optimize,
     });
 
     const editor_module = b.addModule("editor", .{
-        .root_source_file = .{ .path = "src/editor.zig" },
+        .root_source_file = b.path("src/editor.zig"),
         .target = target,
         .optimize = optimize,
     });
 
     const document_module = b.addModule("document", .{
-        .root_source_file = .{ .path = "src/document.zig" },
+        .root_source_file = b.path("src/document.zig"),
         .target = target,
         .optimize = optimize,
     });
